@@ -4,15 +4,23 @@ using UnityEngine;
 
 public class FsmGameStart : FsmState<FSM_GAME_STATE>
 {
+    private GameLogic m_gameLogic;
 
-    public FsmGameStart() : base(FSM_GAME_STATE.START)
+    public FsmGameStart(GameLogic gameLogic) : base(FSM_GAME_STATE.START)
     {
-
+        m_gameLogic = gameLogic;
     }
 
 
     public override void Enter()
     {
+        // 타이머 초기화
+        
+        // 카드 배열 초기화
+
+        // 카드 한번 보여주기 (플립모션)
+
+        // 
 
         base.Enter();
 
@@ -26,4 +34,6 @@ public class FsmGameStart : FsmState<FSM_GAME_STATE>
     {
         base.End();
     }
+
+
 }

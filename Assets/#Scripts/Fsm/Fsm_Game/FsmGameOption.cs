@@ -5,16 +5,17 @@ using UnityEngine;
 
 public class FsmGameOption : FsmState<FSM_GAME_STATE>
 {
+    private GameLogic m_gameLogic;
 
-    public FsmGameOption() : base(FSM_GAME_STATE.OPTION)
+    public FsmGameOption(GameLogic gameLogic) : base(FSM_GAME_STATE.OPTION)
     {
-
+        m_gameLogic = gameLogic;
     }
 
 
     public override void Enter()
     {
-
+        
         base.Enter();
 
     }

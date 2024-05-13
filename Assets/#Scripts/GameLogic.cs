@@ -16,8 +16,7 @@ public class GameLogic : MonoBehaviour
 
 
 
-    [SerializeField]
-    public FSM_GAME_STATE curFsmState { get { return fsmLogic.getCurState.getStateType; }  }
+
 
     private void Awake()
     {
@@ -25,6 +24,7 @@ public class GameLogic : MonoBehaviour
         SetState(FSM_GAME_STATE.START);
 
     }
+
 
     private void Update()
     {
@@ -36,17 +36,32 @@ public class GameLogic : MonoBehaviour
     // Game State FSM Initalize 매서드
     private void InitFSM()
     {
-        fsmLogic.AddFsm(new FsmGamePlay());
-        fsmLogic.AddFsm(new FsmGameOption());
-        fsmLogic.AddFsm(new FsmGameStart());
+        // FSM 모듈에 의존성 주입
+        fsmLogic.AddFsm(new FsmGamePlay(this));
+        fsmLogic.AddFsm(new FsmGameOption(this));
+        fsmLogic.AddFsm(new FsmGameStart(this));
     }
 
     private void SetState(FSM_GAME_STATE state)
     {
         fsmLogic.SetState(state);
     }
-    
 
+    
+    IEnumerator FlipCard()
+    {
+        WaitForSeconds FlipRate = new WaitForSeconds(0.5f);
+
+
+
+        while (true)
+        {
+
+
+            break;
+        }
+        yield return null;
+    }
 
 
 }

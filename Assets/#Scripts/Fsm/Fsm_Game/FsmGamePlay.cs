@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class FsmGamePlay : FsmState<FSM_GAME_STATE>
 {
+    private GameLogic m_gameLogic;
 
-    public FsmGamePlay() : base(FSM_GAME_STATE.PLAY)
+    public FsmGamePlay(GameLogic gameLogic) : base(FSM_GAME_STATE.PLAY)
     {
-
+        m_gameLogic = gameLogic;
     }
 
 
