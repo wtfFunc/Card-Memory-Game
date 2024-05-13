@@ -4,20 +4,6 @@ using UnityEngine;
 using System;
 
 
-public enum FSM_PLAYER_STATE
-{
-	DIE,
-	IDLE,
-	MOVE,
-	REVIVE
-}
-public enum FSM_UI_STATE
-{
-	MAIN,
-	OPTION,
-	SHOP,
-	SELECT_USER
-}
 
 public enum FSM_GAME_STATE
 {
@@ -27,13 +13,6 @@ public enum FSM_GAME_STATE
 	SELEC_REWARD
 }
 
-public enum FSM_PLAYER_EQUIP
-{
-	RIFLE,
-	HANDGUN,
-	GRENADE,
-	HAND,
-}
 
 
 [System.Serializable]
