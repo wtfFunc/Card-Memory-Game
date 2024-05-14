@@ -8,7 +8,7 @@ public class CardScriptableBase : ScriptableObject
 {
     
 
-    [SerializeReference]
+    [SerializeField]
     public List<CardDataTable> cardList = new List<CardDataTable>();
 
 
@@ -39,7 +39,7 @@ public class CardDataTable
     /// 카드 3D 모델링오브젝트
     /// </summary>
     [SerializeField]
-    public GameObject cardPrefab;
+    public List<GameObject> cardPrefab;
 
 }
 
