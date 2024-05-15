@@ -34,6 +34,7 @@ public class FsmGameStart : FsmState<FSM_GAME_STATE>
     {
         // 터치 루프
         m_gameLogic.TouchToCard();
+        m_gameLogic.LoopTimer();
         base.Loop();
     }
     public override void End()

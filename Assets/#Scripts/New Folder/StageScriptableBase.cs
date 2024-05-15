@@ -19,7 +19,7 @@ public class StageScriptableBase : ScriptableObject
     /// 1회 수행시 점수
     /// </summary>
     [SerializeReference]
-    public float stagePairScore;
+    public int stagePairScore;
 
 
     /// <summary>
@@ -40,7 +40,7 @@ public class StageScriptableBase : ScriptableObject
     /// 스테이지 클리어 스코어
     /// </summary>
     [SerializeReference]
-    public float stageClaerScore;
+    public int stageClaerScore;
 
 
     /// <summary>

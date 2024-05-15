@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stage:
     rid: 4950348000489898017
-  stageTimeLimit: 0
-  stagePairScore: 0
+  stageTimeLimit: 40
+  stagePairScore: 2
   stageComboTime: 0
   stageFaildDamage: 0
-  stageClaerScore: 0
-  stageDescription: 2 x 4 Size
+  stageClaerScore: 20
+  stageDescription: 4 x 2 Size
   references:
     version: 2
     RefIds:
     - rid: 4950348000489898017
       type: {class: StageDataTable, ns: , asm: Assembly-CSharp}
       data:
-        xCount: 2
-        yCount: 4
+        xCount: 4
+        yCount: 2

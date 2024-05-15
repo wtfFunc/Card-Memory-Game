@@ -3,28 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 프로젝트 시작 이후 게임을 준비하는 FSM
+/// 모든게임 클리어 한 후 나오는 결과 FSM
 /// </summary>
 public class FsmGameResult : FsmState<FSM_GAME_STATE>
 {
+    private UILogic m_uiLogic;
     private GameLogic m_gameLogic;
 
 
 
-
-    public FsmGameResult(GameLogic gameLogic) : base(FSM_GAME_STATE.RESULT)
+    public FsmGameResult(UILogic uiLogic, GameLogic gameLogic) : base(FSM_GAME_STATE.RESULT)
     {
+        m_uiLogic = uiLogic;
         m_gameLogic = gameLogic;
     }
 
 
     public override void Enter()
     {
+        base.Enter();
         GameManager.instance.restartPanel.gameObject.SetActive(false);
         GameManager.instance.startPanel.gameObject.SetActive(false);
-        GameManager.instance.restartPanel.gameObject.SetActive(true);
 
-        base.Enter();
+        GameManager.instance.resultPanel.gameObject.SetActive(true);
+
+        m_uiLogic.ResultSequence();
 
     }
     public override void Loop()
@@ -36,5 +39,7 @@ public class FsmGameResult : FsmState<FSM_GAME_STATE>
     {
         // 없음
         base.End();
+
+        m_gameLogic.InitScore();
     }
 }

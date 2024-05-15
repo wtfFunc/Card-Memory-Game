@@ -40,9 +40,8 @@ public class Card : MonoBehaviour, ISendState
 
     private void Init()
     {
-        boxcollider.isTrigger = true;
+        boxcollider.isTrigger = false;
         state = Card_State.Close;
-
     }
 
     public BoxCollider boxcollider;
@@ -62,10 +61,12 @@ public class Card : MonoBehaviour, ISendState
         switch (state)
         {
             case Card_State.Open:
+                SoundSFX.Instance.PlaySound("flip");
                 Open();
                 break;
 
             case Card_State.Close:
+                SoundSFX.Instance.PlaySound("flip");
                 Close();
                 break;
 
@@ -95,7 +96,11 @@ public class Card : MonoBehaviour, ISendState
     }
     private void Pair()
     {
-        boxcollider.isTrigger = false;
+        if (boxcollider != null)
+        {
+            boxcollider.isTrigger = false;
+
+        }
     }
 
 

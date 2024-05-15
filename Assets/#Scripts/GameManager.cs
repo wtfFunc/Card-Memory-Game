@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
 
     public GameLogic gameLogic;
 
+    public UILogic uiLogic;
+
+
     public Button startButton;
     public Button restartButton;
     public Button resultButton;
@@ -23,6 +26,9 @@ public class GameManager : MonoBehaviour
 
 
     public e_Level e_Level = e_Level.first;
+
+
+    public int gamePoint = 0;
 
     private void Awake()
     {
@@ -45,14 +51,14 @@ public class GameManager : MonoBehaviour
         // gameLogic.SetState(FSM_GAME_STATE.PLAY);
         startButton.onClick.AddListener(() => { gameLogic.SetState(FSM_GAME_STATE.START); });
         restartButton.onClick.AddListener(() => { gameLogic.SetState(FSM_GAME_STATE.READY); });
-        resultButton.onClick.AddListener(() => { gameLogic.SetState(FSM_GAME_STATE.RESULT); });
+        resultButton.onClick.AddListener(() => 
+        {
+            e_Level = e_Level.first;
+            gameLogic.SetState(FSM_GAME_STATE.READY); 
+        });
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
 
 

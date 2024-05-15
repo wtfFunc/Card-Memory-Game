@@ -19,11 +19,14 @@ public class GameLogic : MonoBehaviour
     public GameObject cardPivotObject;
 
 
-    // 스코어 저장용 플레이어프리펩
-    PlayerPrefs playerScore= new PlayerPrefs();
+    public ScoreTable playerScore = new ScoreTable();
 
+    public ScoreTable tmp_playerScore = new ScoreTable();
 
+    public float limitTime;
+    public float curTime;
 
+    
 
     private StageScriptableBase curStage;
     public StageScriptableBase CurStage { get {return curStage; }}
@@ -35,8 +38,7 @@ public class GameLogic : MonoBehaviour
     private void Awake()
     {
         InitFSM();
-
-
+        
     }
 
 
@@ -54,6 +56,13 @@ public class GameLogic : MonoBehaviour
         selectCard.Clear();
         // 짝을 맞췄던 카드 개수 초기화
         pairCount = 0;
+        // 타이머 초기화
+        SetTimer();
+        // 임시 플레이어점수표 초기화
+        tmp_playerScore = new ScoreTable();
+        // 스테이지 txt 동기화
+        GameManager.instance.uiLogic.stageTxt.text = string.Format("{0:0} Stage", 1+(int)GameManager.instance.e_Level);
+        GameManager.instance.uiLogic.pointTxt.text = string.Format("{0:00}", 0);
     }
 
     // Game State FSM Initalize 매서드
@@ -63,7 +72,7 @@ public class GameLogic : MonoBehaviour
         fsmLogic.AddFsm(new FsmGameReady(this));
         fsmLogic.AddFsm(new FsmGameOption(this));
         fsmLogic.AddFsm(new FsmGameStart(this));
-        fsmLogic.AddFsm(new FsmGameResult(this));
+        fsmLogic.AddFsm(new FsmGameResult(GameManager.instance.uiLogic, this));
     }
 
     public void SetState(FSM_GAME_STATE state)
@@ -72,19 +81,24 @@ public class GameLogic : MonoBehaviour
     }
 
     
+    // 전체카드를 한번 보여주는 코루틴입니다.
     private IEnumerator FlipCard()
     {
-        WaitForSeconds FlipRate = new WaitForSeconds(0.02f);
+        WaitForSeconds FlipRate = new WaitForSeconds(0.1f);
 
         for (int i = 0; i < cardObjects.Count; i++)
         {
+            SoundSFX.Instance.PlaySound("flip");
             // 플립 애니메이션 시퀀스
             cardObjects[i].transform.DORotate(new Vector3(0, 0, 540), flipDuration * 5f, RotateMode.FastBeyond360)
                     .SetEase(Ease.OutQuad);
 
            yield return FlipRate;
         }
-
+        for (int i = 0; i < cardObjects.Count; i++)
+        {
+            cardObjects[i].GetComponent<Card>().boxcollider.isTrigger = true;
+        }
     }
     #region SetGameLogic
     public void SetStage(StageScriptableBase table)
@@ -94,6 +108,8 @@ public class GameLogic : MonoBehaviour
 
         return ;
     }
+
+
 
 
     private System.Random rng = new System.Random();
@@ -176,7 +192,6 @@ public class GameLogic : MonoBehaviour
             }
         }
         cardObjects.Clear();
-        Debug.Log("초기화");
     }
 
     public void CreateDeck(CardScriptableBase cardTableBase)
@@ -221,7 +236,6 @@ public class GameLogic : MonoBehaviour
                 }
             }
 
-            Debug.Log("count = "+(i * ((int)(maxCount * 0.5 / cardTableBase.cardList.Count))));
             // 페어가 존재하여야 하니 전체 카드수량중 절반만 랜덤픽 합니다.
             generatedNumbers = new List<int>();
 
@@ -276,16 +290,25 @@ public class GameLogic : MonoBehaviour
                     // selectCard[0].SendState(Card_State.Pair);
                     select.SendState(Card_State.Open);
                     StartCoroutine(SuccessMatchCard(selectCard[0], select));
-                    Debug.Log("페어페어");
+
+                    tmp_playerScore.pairScore += stageDataTables[(int)GameManager.instance.e_Level].stagePairScore;
+
+                    GameManager.instance.uiLogic.pointTxt.text =string.Format("{0:00}", tmp_playerScore.pairScore);
+
+                    SoundSFX.Instance.PlaySound("pair");
+
+                    pairCount++;
+                    if(pairCount * 2 == cardObjects.Count)
+                    {
+                        ClearGame();
+                    }
                 }
                 else
                 {
-                    // selectCard[0].SendState(Card_State.Open);
                     // 두번째 카드를 오픈
                     select.SendState(Card_State.Open);
 
 
-                    Debug.Log("닫아닫아");
                     // 매치 실패 대미지 코드
                     StartCoroutine(FailedMatchCard(selectCard[0], select));
 
@@ -318,14 +341,28 @@ public class GameLogic : MonoBehaviour
         second.SendState(Card_State.Close);
     }
 
-    public void RestartGame()
-    {
 
-    }
 
     public void ClearGame()
     {
-        if(GameManager.instance.e_Level < e_Level.third)
+        // 임시 Score 갱신
+        tmp_playerScore.clearScore += stageDataTables[(int)GameManager.instance.e_Level].stageClaerScore;
+        tmp_playerScore.timeScore += (int)curTime;
+
+
+
+        playerScore.clearScore += tmp_playerScore.clearScore;
+        playerScore.pairScore += tmp_playerScore.pairScore;
+        playerScore.timeScore += tmp_playerScore.timeScore;
+
+
+        tmp_playerScore.totalScore = tmp_playerScore.clearScore + tmp_playerScore.pairScore + tmp_playerScore.timeScore;
+        playerScore.totalScore += tmp_playerScore.totalScore;
+
+
+
+
+        if (GameManager.instance.e_Level < e_Level.third)
         {
             // nextLevel
             NextGame();
@@ -333,33 +370,45 @@ public class GameLogic : MonoBehaviour
         else
         {
             // result 출력
-            
+            SetState(FSM_GAME_STATE.RESULT);
         }
     }
 
     public void NextGame()
     {
 
+
+        GameManager.instance.e_Level++; 
+        SetState(FSM_GAME_STATE.READY);
     }
 
-    public void HintAction()
-    {
-        
-    }
 
-    
 
     public void InitScore()
     {
-
+        playerScore = new ScoreTable();
     }
 
 
 
-    private float limitTime;
+    
     public void SetTimer()
     {
         limitTime = stageDataTables[(int)GameManager.instance.e_Level].stageTimeLimit;
+        curTime = limitTime;
+    }
+    public void LoopTimer()
+    {
+        if(curTime <= 0f)
+        {
+            NextGame();
+        }
+        else
+        {
+            curTime -= Time.deltaTime;
+        }
+
+        GameManager.instance.uiLogic.SetTimeText(curTime);
     }
 
     public void CloseCard(ISendState state)
@@ -381,7 +430,6 @@ public class GameLogic : MonoBehaviour
     {
         if (Input.touchCount > 0 )
         {
-            Debug.Log("터치터치");
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
@@ -390,22 +438,23 @@ public class GameLogic : MonoBehaviour
 
                 if (Physics.Raycast(ray, out hit))
                 {
-                    // 터치된 오브젝트에 대한 처리를 여기에 작성
-
-                    Debug.Log("카드카드");
-                    // 카드일 경우 호출
-                    Card interactable = hit.collider.GetComponent<Card>();
-                    if (interactable != null)
+                    if (hit.collider.isTrigger == true)
                     {
-                        PairMatchCard(interactable);
+                        // 터치된 오브젝트에 대한 처리를 여기에 작성
+
+                        // 카드일 경우 호출
+                        Card interactable = hit.collider.GetComponent<Card>();
+                        if (interactable != null)
+                        {
+                            PairMatchCard(interactable);
+                        }
                     }
                 }
             }
         }
-        else if(Input.GetKeyDown(KeyCode.Mouse0))
+#if UNITY_EDITOR
+        else if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Debug.Log("터치터치");
-
             if (true)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -414,17 +463,20 @@ public class GameLogic : MonoBehaviour
                 if (Physics.Raycast(ray, out hit))
                 {
                     // 터치된 오브젝트에 대한 처리를 여기에 작성
-
-                    Debug.Log("카드카드");
-                    // 카드일 경우 호출
-                    Card interactable = hit.collider.GetComponent<Card>();
-                    if (interactable != null)
+                    if(hit.collider.isTrigger == true)
                     {
-                        PairMatchCard(interactable);
+                        // 카드일 경우 호출
+                        Card interactable = hit.collider.GetComponent<Card>();
+                        if (interactable != null)
+                        {
+                            PairMatchCard(interactable);
+                        }
+
                     }
                 }
             }
         }
+#endif
     }
 
     List<List<int>> generatedNumberList = new List<List<int>>();
@@ -459,4 +511,17 @@ public enum Card_State
     Open,
     Close,
     Pair
+}
+
+[Serializable]
+public class ScoreTable
+{
+    [SerializeField]
+    public int pairScore = 0;
+    [SerializeField]
+    public int clearScore = 0;
+    [SerializeField]
+    public int timeScore = 0;
+    [SerializeField]
+    public int totalScore = 0;
 }

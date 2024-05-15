@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stage:
     rid: 4950348000489898017
-  stageTimeLimit: 0
-  stagePairScore: 0
+  stageTimeLimit: 15
+  stagePairScore: 1
   stageComboTime: 0
   stageFaildDamage: 0
-  stageClaerScore: 0
+  stageClaerScore: 10
   stageDescription: 2 x 2 Size
   references:
     version: 2
