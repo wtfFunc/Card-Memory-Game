@@ -8,9 +8,9 @@ using System;
 public enum FSM_GAME_STATE
 {
 	START,
-	PLAY,
+	READY,
 	OPTION,
-	SELEC_REWARD
+	RESULT
 }
 
 

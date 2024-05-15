@@ -26,5 +26,5 @@ MonoBehaviour:
     - rid: 4950348000489898017
       type: {class: StageDataTable, ns: , asm: Assembly-CSharp}
       data:
-        xCount: 6
-        yCount: 4
+        xCount: 2
+        yCount: 2
